@@ -91,10 +91,10 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.8",
-    "@types/node": "^24.0.0",
-    "@workflow/world-testing": "4.1.17",
-    "typescript": "5.9.3",
+    "@types/node": "^26.2.0",
+    "@workflow/world-testing": "4.1.18",
+    "typescript": "7.0.2",
     "vitest": "4.1.10",
-    "workflow": "4.8.2"
+    "workflow": "4.8.3"
   }
 }
