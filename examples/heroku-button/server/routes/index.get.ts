@@ -20,6 +20,8 @@ const page = `<!doctype html>
     <main>
       <h1>Workflow Heroku Demo</h1>
       <p>This app runs a durable two-step Workflow DevKit workflow using the personal, unofficial Heroku World and Heroku Postgres.</p>
+      <label for="token">API token</label>
+      <input id="token" type="password" autocomplete="off" placeholder="WORKFLOW_HEROKU_API_TOKEN">
       <label for="message">Workflow message</label>
       <input id="message" value="Hello from Heroku">
       <button id="run" type="button">Run durable workflow</button>
@@ -29,13 +31,16 @@ const page = `<!doctype html>
     <script>
       const button = document.querySelector('#run');
       const output = document.querySelector('#result');
+      const authorization = () => ({
+        authorization: 'Bearer ' + document.querySelector('#token').value,
+      });
       button.addEventListener('click', async () => {
         button.disabled = true;
         output.textContent = 'Starting workflow...';
         try {
           const response = await fetch('/api/runs', {
             method: 'POST',
-            headers: { 'content-type': 'application/json' },
+            headers: { ...authorization(), 'content-type': 'application/json' },
             body: JSON.stringify({ message: document.querySelector('#message').value }),
           });
           let run = await response.json();
@@ -43,7 +48,7 @@ const page = `<!doctype html>
           output.textContent = JSON.stringify(run, null, 2);
           while (run.status !== 'completed' && run.status !== 'failed') {
             await new Promise((resolve) => setTimeout(resolve, 500));
-            const statusResponse = await fetch(run.statusUrl);
+            const statusResponse = await fetch(run.statusUrl, { headers: authorization() });
             run = await statusResponse.json();
             if (!statusResponse.ok) throw new Error(JSON.stringify(run));
             output.textContent = JSON.stringify(run, null, 2);

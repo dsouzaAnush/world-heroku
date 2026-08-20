@@ -126,13 +126,31 @@ try {
     DATABASE_URL: connectionString,
     TEST_DATABASE_URL: connectionString,
     WORKFLOW_HEROKU_POSTGRES_URL: connectionString,
+    WORKFLOW_HEROKU_API_TOKEN: 'integration-test-api-token',
+    WORKFLOW_HEROKU_DATABASE_CONNECTION_LIMIT: '20',
+    WORKFLOW_HEROKU_JOB_PREFIX: 'integration_',
+    WORKFLOW_HEROKU_PROCESS_COUNT: '1',
     WORKFLOW_POSTGRES_URL: connectionString,
+    WORKFLOW_QUEUE_NAMESPACE: 'integration',
     WORKFLOW_TARGET_WORLD: '@anushdsouza/world-heroku',
+    NODE_ENV: 'production',
   };
 
   console.log('Bootstrapping Workflow schema twice to verify idempotency...');
   run(process.execPath, ['bin/bootstrap.js'], { env: environment });
   run(process.execPath, ['bin/bootstrap.js'], { env: environment });
+  console.log('Running the production configuration doctor...');
+  run(process.execPath, ['bin/doctor.js', '--strict'], {
+    env: {
+      ...environment,
+      WORKFLOW_HEROKU_ENCRYPTION_CONTEXT: 'integration-test',
+      WORKFLOW_HEROKU_ENCRYPTION_KEY: '00'.repeat(32),
+    },
+  });
+  console.log('Verifying a drained release is admitted...');
+  run(process.execPath, ['bin/release-check.js', '--json'], {
+    env: environment,
+  });
 
   run(
     process.execPath,

@@ -22,6 +22,26 @@
       "description": "Run the demo using production settings.",
       "value": "production"
     },
+    "WORKFLOW_HEROKU_API_TOKEN": {
+      "description": "Bearer token required by the demo API. Retrieve it from the app's Heroku config vars.",
+      "generator": "secret"
+    },
+    "WORKFLOW_HEROKU_DATABASE_CONNECTION_LIMIT": {
+      "description": "Connection limit of the attached Essential-0 database.",
+      "value": "20"
+    },
+    "WORKFLOW_HEROKU_ENCRYPTION_CONTEXT": {
+      "description": "Stable application-specific context for per-run encryption key derivation.",
+      "generator": "secret"
+    },
+    "WORKFLOW_HEROKU_ENCRYPTION_KEY": {
+      "description": "Stable 32-byte master key generated as 64 hexadecimal characters. Never rotate it while encrypted runs remain.",
+      "generator": "secret"
+    },
+    "WORKFLOW_HEROKU_JOB_PREFIX": {
+      "description": "Graphile Worker task prefix for the demo.",
+      "value": "heroku_demo_"
+    },
     "WORKFLOW_TARGET_WORLD": {
       "description": "Workflow World package loaded by Workflow DevKit.",
       "value": "@anushdsouza/world-heroku"
@@ -33,6 +53,18 @@
     "WORKFLOW_HEROKU_MAX_POOL_SIZE": {
       "description": "Postgres connections reserved for Workflow in the single demo web process.",
       "value": "5"
+    },
+    "WORKFLOW_HEROKU_PROCESS_COUNT": {
+      "description": "Number of web processes that instantiate the World. Update this before scaling the formation.",
+      "value": "1"
+    },
+    "WORKFLOW_HEROKU_RELEASE_POLICY": {
+      "description": "Block code releases while any non-terminal workflow run could replay against a different application version.",
+      "value": "block"
+    },
+    "WORKFLOW_QUEUE_NAMESPACE": {
+      "description": "Workflow SDK queue namespace shared by the runtime and World.",
+      "value": "heroku"
     }
   },
   "formation": {

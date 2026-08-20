@@ -1,6 +1,6 @@
 {
   "name": "@anushdsouza/world-heroku",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A personal, unofficial community World adapter for running Workflow DevKit applications on Heroku Postgres.",
   "type": "module",
   "main": "./dist/index.js",
@@ -9,6 +9,8 @@
   "files": [
     "bin",
     "dist",
+    "docs/architecture.md",
+    "docs/operations.md",
     "LICENSE",
     "NOTICE",
     "README.md"
@@ -26,12 +28,14 @@
   },
   "bin": {
     "bootstrap": "bin/bootstrap.js",
-    "workflow-heroku-bootstrap": "bin/bootstrap.js"
+    "workflow-heroku-bootstrap": "bin/bootstrap.js",
+    "workflow-heroku-doctor": "bin/doctor.js",
+    "workflow-heroku-release-check": "bin/release-check.js"
   },
   "scripts": {
     "audit": "npm audit --audit-level=high",
-    "build": "tsc && chmod +x bin/bootstrap.js",
-    "check": "npm run lint && npm run typecheck && npm test && npm run build && npm run test:exports && npm run pack:check && npm run audit && npm run release:safety",
+    "build": "tsc && chmod +x bin/bootstrap.js bin/doctor.js bin/release-check.js",
+    "check": "npm run lint && npm run typecheck && npm test && npm run build && npm run test:exports && npm run pack:check && npm run test:package-consumer && npm run audit && npm run release:safety",
     "clean": "tsc --build --clean",
     "dev": "tsc --watch",
     "format": "biome check --write .",
@@ -44,7 +48,8 @@
     "test:exports": "node --input-type=module -e \"const world = await import('@anushdsouza/world-heroku'); const schema = await import('@anushdsouza/world-heroku/schema'); if (typeof world.createWorld !== 'function' || !('runs' in schema)) process.exit(1)\"",
     "test:heroku-button": "node scripts/run-heroku-button-integration.mjs",
     "test:integration": "npm run build && node scripts/run-integration.mjs",
-    "test:release": "npm run check && npm run test:integration",
+    "test:package-consumer": "node scripts/test-packed-consumer.mjs",
+    "test:release": "npm run check && npm run test:integration && npm run test:heroku-button",
     "typecheck": "tsc --noEmit"
   },
   "engines": {
@@ -93,6 +98,7 @@
     "@biomejs/biome": "2.5.8",
     "@types/node": "^24.0.0",
     "@workflow/world-testing": "4.1.17",
+    "pg": "8.20.0",
     "typescript": "5.9.3",
     "vitest": "4.1.10",
     "workflow": "4.8.2"
