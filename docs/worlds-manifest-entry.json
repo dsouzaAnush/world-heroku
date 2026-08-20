@@ -1,0 +1,33 @@
+{
+  "id": "heroku",
+  "type": "community",
+  "package": "@anushdsouza/world-heroku",
+  "name": "Heroku (unofficial)",
+  "description": "Personal, unofficial community World for running Workflow DevKit applications on Heroku with Heroku Postgres and an embedded Graphile Worker.",
+  "repository": "https://github.com/dsouzaAnush/world-heroku",
+  "docs": "https://github.com/dsouzaAnush/world-heroku#readme",
+  "features": [],
+  "env": {
+    "WORKFLOW_TARGET_WORLD": "@anushdsouza/world-heroku",
+    "DATABASE_URL": "postgres://world:world@localhost:5432/world"
+  },
+  "services": [
+    {
+      "name": "postgres",
+      "image": "postgres:18-alpine",
+      "ports": ["5432:5432"],
+      "env": {
+        "POSTGRES_USER": "world",
+        "POSTGRES_PASSWORD": "world",
+        "POSTGRES_DB": "world"
+      },
+      "healthCheck": {
+        "cmd": "pg_isready",
+        "interval": "10s",
+        "timeout": "5s",
+        "retries": 5
+      }
+    }
+  ],
+  "setup": "npx --package=@anushdsouza/world-heroku workflow-heroku-bootstrap"
+}

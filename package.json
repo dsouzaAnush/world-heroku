@@ -1,0 +1,98 @@
+{
+  "name": "@anushdsouza/world-heroku",
+  "version": "0.1.0",
+  "description": "A personal, unofficial community World adapter for running Workflow DevKit applications on Heroku Postgres.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "sideEffects": false,
+  "files": [
+    "bin",
+    "dist",
+    "LICENSE",
+    "NOTICE",
+    "README.md"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./schema": {
+      "types": "./dist/schema.d.ts",
+      "default": "./dist/schema.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "bin": {
+    "bootstrap": "bin/bootstrap.js",
+    "workflow-heroku-bootstrap": "bin/bootstrap.js"
+  },
+  "scripts": {
+    "audit": "npm audit --audit-level=high",
+    "build": "tsc && chmod +x bin/bootstrap.js",
+    "check": "npm run lint && npm run typecheck && npm test && npm run build && npm run test:exports && npm run pack:check && npm run audit && npm run release:safety",
+    "clean": "tsc --build --clean",
+    "dev": "tsc --watch",
+    "format": "biome check --write .",
+    "lint": "biome check .",
+    "pack:check": "npm pack --dry-run",
+    "prepack": "npm run build",
+    "release:safety": "node scripts/public-release-check.mjs",
+    "test": "vitest run",
+    "test:exports": "node --input-type=module -e \"const world = await import('@anushdsouza/world-heroku'); const schema = await import('@anushdsouza/world-heroku/schema'); if (typeof world.createWorld !== 'function' || !('runs' in schema)) process.exit(1)\"",
+    "test:integration": "npm run build && node scripts/run-integration.mjs",
+    "test:release": "npm run check && npm run test:integration",
+    "typecheck": "tsc --noEmit"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "packageManager": "npm@11.17.0",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dsouzaAnush/world-heroku.git"
+  },
+  "homepage": "https://github.com/dsouzaAnush/world-heroku#readme",
+  "bugs": {
+    "url": "https://github.com/dsouzaAnush/world-heroku/issues"
+  },
+  "license": "Apache-2.0",
+  "author": {
+    "name": "Anush D'Souza",
+    "email": "anush11395@gmail.com",
+    "url": "https://github.com/dsouzaAnush"
+  },
+  "keywords": [
+    "workflow",
+    "workflow-devkit",
+    "world",
+    "heroku",
+    "postgres",
+    "durable-execution",
+    "durable-functions"
+  ],
+  "dependencies": {
+    "@workflow/world-postgres": "4.3.3"
+  },
+  "overrides": {
+    "@hono/node-server": "1.19.15",
+    "hono": "4.12.34",
+    "nanoid": "5.1.16",
+    "undici": "7.29.0"
+  },
+  "peerDependencies": {
+    "workflow": ">=4.8.2 <5"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.5.8",
+    "@types/node": "^24.0.0",
+    "@workflow/world-testing": "4.1.17",
+    "typescript": "5.9.3",
+    "vitest": "4.1.10",
+    "workflow": "4.8.2"
+  }
+}

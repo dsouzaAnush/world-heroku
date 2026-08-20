@@ -1,0 +1,6 @@
+Workflow World for Heroku
+Copyright 2026 Anush D'Souza
+
+This project depends on software developed by Vercel, Inc. and contributors to
+the Workflow project, including @workflow/world-postgres, under the Apache
+License, Version 2.0.

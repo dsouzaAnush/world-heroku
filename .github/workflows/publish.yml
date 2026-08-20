@@ -1,0 +1,94 @@
+name: Publish
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    name: Publish npm package
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: npm
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_DB: world
+          POSTGRES_PASSWORD: world
+          POSTGRES_USER: world
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgres://world:world@localhost:5432/world
+      TEST_DATABASE_URL: postgres://world:world@localhost:5432/world
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.release.tag_name }}
+
+      - name: Verify release ref belongs to main
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          if [[ ! "$RELEASE_TAG" =~ ^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-[0-9A-Za-z.-]+)?(\+[0-9A-Za-z.-]+)?$ ]]; then
+            echo "Invalid release tag: $RELEASE_TAG" >&2
+            exit 1
+          fi
+          git fetch --no-tags origin main
+          git merge-base --is-ancestor HEAD origin/main
+
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check package
+        run: npm run check
+
+      - name: Bootstrap Workflow schema
+        run: node bin/bootstrap.js
+
+      - name: Test against Postgres
+        run: npm run test:integration
+
+      - name: Verify release version
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: test "v$(node -p \"require('./package.json').version\")" = "$RELEASE_TAG"
+
+      - name: Check whether the version already exists
+        id: registry
+        run: |
+          PACKAGE_SPEC="$(node -p \"require('./package.json').name + '@' + require('./package.json').version\")"
+          if npm view "$PACKAGE_SPEC" version >/dev/null 2>&1; then
+            echo "published=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "published=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Publish
+        if: steps.registry.outputs.published != 'true'
+        run: npm publish --access public
+
+      - name: Verify published version
+        run: |
+          PACKAGE_SPEC="$(node -p \"require('./package.json').name + '@' + require('./package.json').version\")"
+          test "$(npm view "$PACKAGE_SPEC" version)" = "$(node -p \"require('./package.json').version\")"

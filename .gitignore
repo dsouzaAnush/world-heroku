@@ -1,0 +1,12 @@
+node_modules/
+dist/
+*.tgz
+.env
+.env.*
+!.env.example
+.DS_Store
+coverage/
+*.tsbuildinfo
+
+# Local-only review notes or evidence must never enter the public repository.
+internal/
