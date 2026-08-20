@@ -2,20 +2,29 @@
 
 ## Verdict
 
-**Engineering gate passed; personal open-source release candidate in progress.**
+**Released; ready for public review.**
 
 The package, configuration resolver, bootstrap command, public exports, real
 PostgreSQL behavior, official World conformance suite, packaged consumer path,
-and representative cookbook workflows pass. The release identity is the
-personal `@anushdsouza/world-heroku` npm package and the public
-`dsouzaAnush/world-heroku` GitHub repository. The provider-bearing package and
-repository names follow the World ecosystem pattern while the personal scope
-makes ownership explicit. This is an unofficial community project, not a
-Heroku, Salesforce, Vercel, or Workflow product.
+and representative cookbook workflows pass. Version `0.1.0` is public as the
+personal [`@anushdsouza/world-heroku`](https://www.npmjs.com/package/@anushdsouza/world-heroku)
+npm package and the
+[`dsouzaAnush/world-heroku`](https://github.com/dsouzaAnush/world-heroku)
+GitHub repository. The provider-bearing names follow the World ecosystem
+pattern while the personal scope makes ownership explicit. This is an
+unofficial community project, not a Heroku, Salesforce, Vercel, or Workflow
+product.
 
-Verified on 2026-08-19 with Node.js 22.23.1, 24.15.0, and 26.5.0; npm 11.17.0;
-Docker 29.2.1; and PostgreSQL 18 Alpine. The exact release candidate is rerun
-after every metadata or documentation change.
+The immutable [`v0.1.0`](https://github.com/dsouzaAnush/world-heroku/releases/tag/v0.1.0)
+tag resolves to the single public-safe root commit
+`e14298514df381c28baac3dcb70f72eca46e228f`. Later `main` commits are public
+release-automation maintenance and SHA-pinned GitHub Action upgrades; they do
+not import private prototype or review history.
+
+Verified locally on 2026-08-19 with Node.js 22.23.1, 24.15.0, and 26.5.0; npm
+11.17.0; Docker 29.2.1; and PostgreSQL 18 Alpine. On 2026-08-20, the public
+repository passed the same real-database CI matrix on Node.js 22, 24, and 26,
+and the published npm tarball passed a clean registry-consumer import check.
 
 ## Reference snapshots
 
@@ -45,12 +54,13 @@ compatibility boundary explicit.
 | Official World conformance | Basic execution, idempotency, hooks and streaming, null-byte serialization, retry and fatal-error behavior | Pass, 5/5 |
 | Adapter lifecycle | Start, storage read, and close against PostgreSQL 18 | Pass, 1/1 |
 | Packaged consumer | Installed the generated `.tgz` into Vercel's Next.js Postgres example and built generated Workflow routes | Pass |
+| Public registry consumer | Installed `@anushdsouza/world-heroku@0.1.0` from npm into a clean temporary project; imported the root and `/schema`; verified both installed bootstrap links | Pass |
 | Example runtime | Invoked `/api/signup`; durable run completed with 3/3 completed steps | Pass |
 | Cookbook saga | Fatal provisioning failure and reverse compensation | Pass, `{"status":"rolled_back"}` |
 | Cookbook fan-out | Three parallel notification steps | Pass, 3 delivered / 0 failed |
 | Cookbook batching | Five items in batches of two with durable one-second pauses | Pass, 5 succeeded / 0 failed |
 | Local Node.js matrix | Full clean-install release gate on 22.23.1, 24.15.0, and 26.5.0 | Pass, 3/3 |
-| Hosted GitHub Actions matrix | Node.js 22, 24, and 26 jobs on the public repository | Required before the release is tagged; record the public run after it completes |
+| Hosted GitHub Actions matrix | [Node.js 22, 24, and 26 with PostgreSQL 18](https://github.com/dsouzaAnush/world-heroku/actions/runs/32406484671) | Pass, 3/3 |
 
 The example and cookbook tests use the packed
 `@anushdsouza/world-heroku@0.1.0` tarball,
@@ -98,8 +108,8 @@ this package does not.
   badge or benchmark until upstream runs and publishes those results.
 - Local PostgreSQL conformance does not prove live Heroku deploy, restart,
   graceful-shutdown, rollback, or database-interruption behavior.
-- Do not describe hosted CI as passing until the public Node.js 22, 24, and 26
-  jobs complete on the exact public release commit.
+- Hosted CI passes on the public release source and on current `main`; preserve
+  that real PostgreSQL gate for every accepted change.
 
 Until a live Heroku lifecycle exercise is complete, describe the project as an
 experimental community adapter over Postgres World, not a production-proven
