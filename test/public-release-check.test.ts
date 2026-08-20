@@ -28,6 +28,29 @@ afterEach(() => {
 });
 
 describe('public release safety check', () => {
+  test('allows only the repository release-age npm policy', () => {
+    const root = createRepository();
+    writeFileSync(
+      join(root, '.npmrc'),
+      '# Hold newly published packages before they become eligible for resolution.\n' +
+        'min-release-age=7\n',
+    );
+
+    expect(scanPublicRelease(root).findings).toEqual([]);
+  });
+
+  test('rejects other root npm configuration', () => {
+    const root = createRepository();
+    writeFileSync(
+      join(root, '.npmrc'),
+      '//registry.npmjs.org/:_authToken=secret\n',
+    );
+
+    expect(scanPublicRelease(root).findings).toEqual([
+      '.npmrc: unsafe root npm configuration',
+    ]);
+  });
+
   test('allows example environment files at any depth', () => {
     const root = createRepository();
     mkdirSync(join(root, 'config'));

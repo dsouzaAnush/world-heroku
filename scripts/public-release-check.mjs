@@ -6,12 +6,11 @@ import { isAbsolute, relative, resolve, sep } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const maxPublicFileBytes = 2 * 1024 * 1024;
+const allowedRootNpmrc =
+  '# Hold newly published packages before they become eligible for resolution.\n' +
+  'min-release-age=7\n';
 
-const forbiddenPaths = [
-  /(^|\/)\.npmrc$/,
-  /(^|\/)\.pypirc$/,
-  /\.(?:key|p12|pfx|pem|tgz)$/i,
-];
+const forbiddenPaths = [/(^|\/)\.pypirc$/, /\.(?:key|p12|pfx|pem|tgz)$/i];
 
 const contentPatterns = [
   {
@@ -59,9 +58,11 @@ const contentPatterns = [
 function isUnsafePublicPath(file) {
   const isEnvironmentFile = /(^|\/)\.env(?:\.|$)/.test(file);
   const isExampleEnvironmentFile = /(^|\/)\.env\.example$/.test(file);
+  const isNpmrc = /(^|\/)\.npmrc$/.test(file);
 
   return (
     (isEnvironmentFile && !isExampleEnvironmentFile) ||
+    (isNpmrc && file !== '.npmrc') ||
     forbiddenPaths.some((pattern) => pattern.test(file))
   );
 }
@@ -115,6 +116,11 @@ export function scanPublicRelease(
     }
 
     const content = data.toString('utf8');
+    if (file === '.npmrc' && content !== allowedRootNpmrc) {
+      findings.push(`${file}: unsafe root npm configuration`);
+      continue;
+    }
+
     for (const { label, expression } of contentPatterns) {
       if (expression.test(content)) {
         findings.push(`${file}: ${label}`);

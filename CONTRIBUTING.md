@@ -9,13 +9,20 @@ Use Node.js 22 or newer and npm 11:
 ```bash
 npm install
 npm run check
+npm run test:package-consumer
 npm run test:integration
+npm run test:heroku-button
 npm run release:safety
 ```
 
 The integration command requires Docker, or a disposable PostgreSQL database
 provided through `TEST_DATABASE_URL`. It bootstraps the schema and executes the
 official Workflow World conformance suite against this package.
+
+The packed-consumer command tests the exact npm tarball in an empty project.
+The Heroku Button command builds and exercises the production sample against a
+real PostgreSQL service, including restart, outage, retry, hook, cookbook,
+encryption, route-security, release-drain, and shutdown behavior.
 
 Use `npm run format` to apply the repository's Biome formatting and safe lint
 fixes.

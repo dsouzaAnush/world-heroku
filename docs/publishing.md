@@ -18,8 +18,10 @@ The package deliberately uses the maintainer's npm scope rather than
 
 ## 1. Build the release candidate
 
-The repository must begin with one reviewed, public-safe root commit. Do not
-import prototype, internal-repository, test-consumer, or prior-art history.
+The public repository already has a clean `0.1.0` lineage. Prepare later work
+on a `codex/*` or contributor branch and publish only one reviewed squash
+commit. Never push intermediate branches that contain private notes,
+credentials, local paths, copied prototype history, or discarded experiments.
 
 Before the first private push:
 
@@ -28,16 +30,15 @@ npm ci
 npm run test:release
 npm run release:safety
 git status --short --branch
-git rev-list --count HEAD
-git log --oneline --decorate --all
-git fsck --no-reflogs --unreachable
+git log --oneline --decorate origin/main..HEAD
+git diff --check origin/main...HEAD
 ```
 
-The expected result is a clean worktree, one root commit, and no unreachable
-objects containing superseded private work. Push only that commit as `main` in
-a new public `dsouzaAnush/world-heroku` repository. Keep any private review
-repository private so its branch and pull-request refs can never become
-public.
+The expected result is a clean worktree and one public-safe candidate commit
+relative to `origin/main`. If the work was developed through multiple local
+commits, squash it locally before the first push, or push only a freshly
+created squash branch. Do not force-push or rewrite the already public `main`
+history.
 
 Configure the public repository to allow squash merges only. Each accepted
 branch must be squash-merged so `main` remains linear and reviewable.
@@ -89,14 +90,18 @@ require reviewer approval where the GitHub plan supports it.
 
 1. Update the version and `CHANGELOG.md` on a release branch.
 2. Run `npm ci && npm run test:release` on the exact candidate.
-3. Review and squash-merge the pull request into `main`.
-4. Confirm `main` is clean, linear, public-safe, and contains no private data.
-5. Tag that exact commit as `vX.Y.Z`.
-6. Publish a GitHub Release for the tag.
-7. The `Publish` workflow verifies strict tag syntax, proves the tag commit is
+3. Deploy that candidate to a disposable Heroku app, run the live lifecycle
+   checklist, preserve only redacted evidence, and delete the app and add-on.
+4. Run the final security diff review and public-source scanner after removing
+   all local evidence from the repository candidate.
+5. Review and squash-merge the pull request into `main`.
+6. Confirm `main` is clean, linear, public-safe, and contains no private data.
+7. Tag that exact commit as `vX.Y.Z`.
+8. Publish a GitHub Release for the tag.
+9. The `Publish` workflow verifies strict tag syntax, proves the tag commit is
    on `main`, verifies the tag/version match, reruns the real PostgreSQL gate,
    and publishes through npm OIDC.
-8. Verify npm visibility, version, tarball contents, integrity, and install
+10. Verify npm visibility, version, tarball contents, integrity, and install
    behavior from a clean temporary consumer.
 
 The workflow is idempotent: if the exact immutable npm version already exists,
@@ -104,18 +109,21 @@ it verifies the registry version rather than trying to overwrite it.
 
 ## 5. Open-source gate
 
-Do not reuse a private review repository merely because its `main` branch is
-clean. Private pull-request refs can retain superseded work. Instead:
+The canonical repository is already public. Do not rewrite its existing
+`main` branch or reuse private review refs. Instead:
 
-1. Finish release review without reusing private branch or pull-request refs.
-2. Squash all accepted work into one public-safe root commit.
+1. Finish release review on a local branch that has never been pushed.
+2. Squash all accepted work into one public-safe commit on top of public
+   `origin/main`.
 3. Run the full release and public-source safety gates on that exact commit.
-4. Create a new public repository and push only the root commit to `main`.
-5. Inspect every public commit, tag, file, author identity, and remote URL.
-6. Confirm there are no secrets, private paths, internal URLs, customer data,
+4. Inspect the commit, author identity, file list, and remote URL before its
+   first push.
+5. Confirm there are no secrets, private paths, internal URLs, customer data,
    private notes, copied private history, or misleading official branding.
-7. Confirm the README's independent-project disclaimer and personal ownership.
-8. Run the Node.js 22/24/26 GitHub Actions matrix on the public commit.
+6. Confirm the README's independent-project disclaimer and personal ownership.
+7. Open a focused public pull request and run the Node.js 22/24/26 GitHub
+   Actions matrix.
+8. Squash-merge through GitHub; do not force-push or replace public history.
 
 Once public, `--provenance` may be added to the publish workflow for a new
 version after verifying npm's current provenance requirements. Existing npm
@@ -159,7 +167,9 @@ From a clean temporary consumer:
 
 ```bash
 npm view @anushdsouza/world-heroku version dist.integrity repository.url
+# Add the README's tested Workflow 4 overrides to the root package.json.
 npm install workflow @anushdsouza/world-heroku
+npm audit --omit=dev --audit-level=high
 npx workflow-heroku-bootstrap
 ```
 

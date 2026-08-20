@@ -6,10 +6,14 @@
   "description": "Personal, unofficial community World for running Workflow DevKit applications on Heroku with Heroku Postgres and an embedded Graphile Worker.",
   "repository": "https://github.com/dsouzaAnush/world-heroku",
   "docs": "https://github.com/dsouzaAnush/world-heroku#readme",
-  "features": [],
+  "features": ["encryption"],
   "env": {
     "WORKFLOW_TARGET_WORLD": "@anushdsouza/world-heroku",
-    "DATABASE_URL": "postgres://world:world@localhost:5432/world"
+    "DATABASE_URL": "postgres://world:world@localhost:5432/world",
+    "WORKFLOW_HEROKU_ENCRYPTION_KEY": "0000000000000000000000000000000000000000000000000000000000000000",
+    "WORKFLOW_HEROKU_ENCRYPTION_CONTEXT": "workflow-community-e2e",
+    "WORKFLOW_HEROKU_JOB_PREFIX": "heroku_e2e_",
+    "WORKFLOW_QUEUE_NAMESPACE": "herokue2e"
   },
   "services": [
     {

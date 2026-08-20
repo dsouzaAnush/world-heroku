@@ -31,6 +31,7 @@ describe('resolveHerokuWorldConfig', () => {
         DATABASE_URL: 'postgres://database.example/default',
         WORKFLOW_HEROKU_JOB_PREFIX: 'payments',
         WORKFLOW_HEROKU_MAX_POOL_SIZE: '14',
+        WORKFLOW_QUEUE_NAMESPACE: 'payments',
         WORKFLOW_HEROKU_POSTGRES_URL:
           'postgres://database.example/heroku-world',
         WORKFLOW_HEROKU_WORKER_CONCURRENCY: '12',
@@ -43,8 +44,38 @@ describe('resolveHerokuWorldConfig', () => {
       connectionString: 'postgres://database.example/heroku-world',
       jobPrefix: 'payments',
       maxPoolSize: 14,
+      namespace: 'payments',
       queueConcurrency: 12,
     });
+  });
+
+  it('configures payload encryption only when key and context are paired', () => {
+    expect(
+      resolveHerokuWorldConfig({
+        DATABASE_URL: 'postgres://database.example/workflows',
+        WORKFLOW_HEROKU_ENCRYPTION_CONTEXT: 'app-123',
+        WORKFLOW_HEROKU_ENCRYPTION_KEY: '00'.repeat(32),
+      }),
+    ).toMatchObject({
+      encryptionContext: 'app-123',
+      encryptionKey: '00'.repeat(32),
+    });
+
+    expect(() =>
+      resolveHerokuWorldConfig({
+        DATABASE_URL: 'postgres://database.example/workflows',
+        WORKFLOW_HEROKU_ENCRYPTION_KEY: '00'.repeat(32),
+      }),
+    ).toThrow('must be configured together');
+  });
+
+  it('validates the upstream queue namespace contract early', () => {
+    expect(() =>
+      resolveHerokuWorldConfig({
+        DATABASE_URL: 'postgres://database.example/workflows',
+        WORKFLOW_QUEUE_NAMESPACE: 'Invalid-Prefix',
+      }),
+    ).toThrow('must be lowercase alphanumeric');
   });
 
   it('fails fast instead of silently using a local development database', () => {
@@ -75,5 +106,20 @@ describe('createWorld', () => {
 
     expect(createWorld(config)).toEqual({ adapter: 'postgres' });
     expect(mocks.createPostgresWorld).toHaveBeenCalledWith(config);
+  });
+
+  it('adds official World encryption without forwarding adapter-only config', async () => {
+    const world = createWorld({
+      connectionString: 'postgres://world:world@localhost:5432/world',
+      encryptionContext: 'app-123',
+      encryptionKey: '00'.repeat(32),
+    });
+
+    expect(mocks.createPostgresWorld).toHaveBeenLastCalledWith({
+      connectionString: 'postgres://world:world@localhost:5432/world',
+    });
+    await expect(
+      world.getEncryptionKeyForRun?.('wrun_123'),
+    ).resolves.toHaveLength(32);
   });
 });
