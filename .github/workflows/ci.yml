@@ -63,3 +63,6 @@ jobs:
 
       - name: Test against Postgres
         run: npm run test:integration
+
+      - name: Test Deploy to Heroku sample
+        run: npm run test:heroku-button

@@ -16,6 +16,8 @@
 [![npm version](https://img.shields.io/npm/v/@anushdsouza/world-heroku.svg)](https://www.npmjs.com/package/@anushdsouza/world-heroku)
 [![Apache-2.0 license](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](./LICENSE)
 
+[![Deploy to Heroku](https://www.herokucdn.com/deploy/button.svg)](https://www.heroku.com/deploy?template=https://github.com/dsouzaAnush/world-heroku)
+
 `@anushdsouza/world-heroku` is a personal, unofficial community
 [World](https://workflow-sdk.dev/worlds) adapter for the
 [Workflow DevKit](https://workflow-sdk.dev) on Heroku. It uses Heroku Postgres
@@ -50,6 +52,29 @@ convention for independently published community Worlds. The `@workflow/*`
 namespace is reserved for packages published by the Workflow project.
 
 ## Deploy on Heroku
+
+### Try the deployable demo
+
+The button provisions a runnable demo with one Basic web dyno and an
+Essential-0 Heroku Postgres database, builds the Workflow DevKit routes,
+bootstraps the schema in Heroku's release phase, and opens a page where you can
+start and observe a durable two-step workflow:
+
+[![Deploy to Heroku](https://www.herokucdn.com/deploy/button.svg)](https://www.heroku.com/deploy?template=https://github.com/dsouzaAnush/world-heroku)
+
+> [!WARNING]
+> The template creates paid Heroku resources: one `basic` dyno and one
+> `heroku-postgresql:essential-0` database. Review
+> [Heroku's current usage and billing documentation](https://devcenter.heroku.com/articles/usage-and-billing)
+> before deploying, and delete the app when you finish testing if you do not
+> want it to keep accruing usage.
+
+The deployable application is intentionally isolated in
+[`examples/heroku-button`](./examples/heroku-button). It installs the published
+`@anushdsouza/world-heroku` package from npm; the root repository remains the
+World library, and the demo is excluded from the npm package tarball.
+
+### Configure your own application
 
 Attach Heroku Postgres to your application, then select the World:
 
@@ -205,6 +230,7 @@ Requirements: Node.js 22 or newer and npm 11.
 npm install
 npm run check
 npm run test:integration
+npm run test:heroku-button
 npm run release:safety
 ```
 
@@ -215,6 +241,10 @@ starts an isolated PostgreSQL 18 container when `TEST_DATABASE_URL` is not
 already set, verifies that schema bootstrap is idempotent, and runs both the
 adapter smoke test and the official Workflow World conformance suite. CI runs
 that same real-database gate on Node.js 22, 24, and 26. `npm run
+test:heroku-button` performs a clean install of the deployable sample, builds
+its transformed Workflow routes, boots the published npm package against a real
+Postgres database, starts the production server, triggers the sample over HTTP,
+and waits for its durable two-step run to complete. `npm run
 release:safety` scans the complete public source candidate for credential
 patterns, private filesystem paths, unsafe environment files, private keys,
 and oversized or unexpected release artifacts.

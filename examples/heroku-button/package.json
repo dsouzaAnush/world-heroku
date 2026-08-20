@@ -1,0 +1,33 @@
+{
+  "name": "world-heroku-button-demo",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Deploy-button verification app for @anushdsouza/world-heroku.",
+  "type": "module",
+  "scripts": {
+    "build": "nitro build",
+    "dev": "nitro dev",
+    "start": "node .output/server/index.mjs",
+    "typecheck": "tsc --noEmit"
+  },
+  "engines": {
+    "node": ">=22.12"
+  },
+  "dependencies": {
+    "@anushdsouza/world-heroku": "0.1.0",
+    "@opentelemetry/api": "1.9.0",
+    "nitro": "3.0.260610-beta",
+    "rollup": "4.62.5",
+    "workflow": "4.8.2"
+  },
+  "devDependencies": {
+    "@types/node": "24.10.1",
+    "typescript": "5.9.3"
+  },
+  "overrides": {
+    "@hono/node-server": "1.19.15",
+    "hono": "4.12.34",
+    "nanoid": "5.1.16",
+    "undici": "7.29.0"
+  }
+}

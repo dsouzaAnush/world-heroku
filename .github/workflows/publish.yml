@@ -69,6 +69,9 @@ jobs:
       - name: Test against Postgres
         run: npm run test:integration
 
+      - name: Test Deploy to Heroku sample
+        run: npm run test:heroku-button
+
       - name: Verify release version
         env:
           RELEASE_TAG: ${{ github.event.release.tag_name }}
