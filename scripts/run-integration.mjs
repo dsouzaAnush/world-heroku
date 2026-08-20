@@ -3,7 +3,8 @@
 import { spawnSync } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
 
-const POSTGRES_IMAGE = 'postgres:18-alpine';
+const POSTGRES_IMAGE =
+  process.env.TEST_POSTGRES_IMAGE?.trim() || 'postgres:18-alpine';
 const POSTGRES_USER = 'world';
 const POSTGRES_PASSWORD = 'world';
 const POSTGRES_DATABASE = 'world';
@@ -50,6 +51,8 @@ async function startPostgres() {
         containerName,
         '--publish',
         '127.0.0.1::5432',
+        '--tmpfs',
+        '/var/lib/postgresql/data:rw,size=512m',
         '--env',
         `POSTGRES_USER=${POSTGRES_USER}`,
         '--env',

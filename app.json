@@ -1,0 +1,44 @@
+{
+  "name": "Workflow Heroku Demo",
+  "description": "Deploy a small durable Workflow DevKit demo backed by the personal, unofficial Heroku World and Heroku Postgres.",
+  "repository": "https://github.com/dsouzaAnush/world-heroku",
+  "website": "https://github.com/dsouzaAnush/world-heroku#readme",
+  "success_url": "/",
+  "keywords": ["heroku", "nodejs", "postgres", "workflow", "workflow-devkit"],
+  "stack": "heroku-24",
+  "buildpacks": [
+    {
+      "url": "heroku/nodejs"
+    }
+  ],
+  "addons": [
+    {
+      "plan": "heroku-postgresql:essential-0",
+      "as": "DATABASE"
+    }
+  ],
+  "env": {
+    "NODE_ENV": {
+      "description": "Run the demo using production settings.",
+      "value": "production"
+    },
+    "WORKFLOW_TARGET_WORLD": {
+      "description": "Workflow World package loaded by Workflow DevKit.",
+      "value": "@anushdsouza/world-heroku"
+    },
+    "WORKFLOW_HEROKU_WORKER_CONCURRENCY": {
+      "description": "Embedded Graphile Worker concurrency for the single demo web process.",
+      "value": "2"
+    },
+    "WORKFLOW_HEROKU_MAX_POOL_SIZE": {
+      "description": "Postgres connections reserved for Workflow in the single demo web process.",
+      "value": "5"
+    }
+  },
+  "formation": {
+    "web": {
+      "quantity": 1,
+      "size": "basic"
+    }
+  }
+}
