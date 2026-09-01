@@ -78,7 +78,7 @@
     "durable-functions"
   ],
   "dependencies": {
-    "@workflow/world-postgres": "4.3.3"
+    "@workflow/world-postgres": "4.3.5"
   },
   "overrides": {
     "@hono/node-server": "1.19.15",
