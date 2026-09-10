@@ -94,7 +94,7 @@
     "@types/node": "^24.0.0",
     "@workflow/world-testing": "4.1.17",
     "typescript": "5.9.3",
-    "vitest": "4.1.10",
+    "vitest": "4.1.11",
     "workflow": "4.8.2"
   }
 }
