@@ -90,11 +90,11 @@
     "workflow": ">=4.8.2 <5"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.5.8",
-    "@types/node": "^24.0.0",
-    "@workflow/world-testing": "4.1.17",
-    "typescript": "5.9.3",
-    "vitest": "4.1.10",
+    "@biomejs/biome": "2.6.4",
+    "@types/node": "^26.6.6",
+    "@workflow/world-testing": "5.0.6",
+    "typescript": "7.0.2",
+    "vitest": "5.0.5",
     "workflow": "4.8.2"
   }
 }
